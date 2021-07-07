@@ -187,11 +187,6 @@ class Perceiver(nn.Module):
                 self_attns
             ]))
 
-        self.to_logits = nn.Sequential(
-            nn.LayerNorm(latent_dim),
-            nn.Linear(latent_dim, num_classes)
-        )
-
         self.sinu_emb = None
         if self_attn_rel_pos:
             self.sinu_emb = SinusoidalEmbeddings(latent_dim_head)
@@ -233,5 +228,4 @@ class Perceiver(nn.Module):
                 x = self_attn(x, pos_emb = pos_emb) + x
                 x = self_ff(x) + x
 
-        x = x.mean(dim = -2)
-        return self.to_logits(x)
+        return x
