@@ -196,7 +196,7 @@ class Perceiver(nn.Module):
         if self_attn_rel_pos:
             self.sinu_emb = SinusoidalEmbeddings(latent_dim_head)
 
-    def forward(self, data, mask = None):
+    def forward(self, data, mask = None, latent=None):
         b, *axis, _, device = *data.shape, data.device
         assert len(axis) == self.input_axis, 'input data must have the right number of axis'
 
@@ -214,8 +214,10 @@ class Perceiver(nn.Module):
         # concat to channels of data and flatten axis
 
         data = rearrange(data, 'b ... d -> b (...) d')
-
-        x = repeat(self.latents, 'n d -> b n d', b = b)
+        if latent is None:
+            x = repeat(self.latents, 'n d -> b n d', b = b)
+        else:
+            x = latent
 
         # rotary embeddings for latents, if specified
 
